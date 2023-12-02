@@ -1,7 +1,7 @@
 BeginPackage["JerryI`Mirage`OpenCL`", {"JerryI`Mirage`IR`", "SymbolicC`"}]
 
 
-MakeCL /: MakeCL[IR`Function[type_, name_String, args_List, body_]] := CFunction[MakeCL[type], name, {# // IR, # // Type // MakeCL} &/@ args, MakeCL[body]]
+MakeCL /: MakeCL[IR`Function[type_, name_String, args_List, body_]] := CFunction[MakeCL[type], name, {# // Type // MakeCL, # // IR} &/@ args, MakeCL[body]]
 
 MakeCL /: MakeCL[a_String] := a 
 
@@ -9,6 +9,8 @@ MakeCL /: MakeCL[IR`Type`Real] := "float"
 MakeCL /: MakeCL[IR`Define[IR`Entity[name_String, _, IR`Type`Real]]] := CDeclare["float", name]
 
 MakeCL /: MakeCL[IR`Block[l_List]] := CBlock[ MakeCL[#] &/@ l ]
+
+MakeCL /: MakeCL[IR`List[l_List]] := CStatement[MakeCL[#]] &/@ l 
 
 MakeCL /: MakeCL[IR`Entity[data_, _, _]] := MakeCL[data]
 MakeCL /: MakeCL[IR`Entity[IR`Constant, value_, IR`Type`Real]] := value
@@ -25,6 +27,11 @@ MakeCL /: MakeCL[IR`While[cond_, body_]] := CWhile[MakeCL[cond], MakeCL[body]]
 
 MakeCL /: MakeCL[IR`Operator[op_, var_]] := COperator[op, var // MakeCL]
 MakeCL /: MakeCL[IR`Operator[op_, varA_, varB_]] := COperator[op, {varA // MakeCL, varB // MakeCL}]
+
+(* cast from int to float *)
+MakeCL /: MakeCL[IR`Operator[Times, IR`Entity[firstA__, IR`Type`Real], IR`Entity[firstB__, IR`Type`Integer]]] := COperator[Times, {IR`Entity[firstA, IR`Type`Real] // MakeCL, CCast["float", IR`Entity[firstB, IR`Type`Integer] // MakeCL] // CParentheses} ]
+MakeCL /: MakeCL[IR`Operator[Times, IR`Entity[firstA__, IR`Type`Integer], IR`Entity[firstB__, IR`Type`Real]]] := COperator[Times, {CCast["float", IR`Entity[firstA, IR`Type`Integer] // MakeCL] // CParentheses, IR`Entity[firstB, IR`Type`Real] // MakeCL}]
+
 
 
 Mirage`OpenCL`Translate[f_] := Module[{}, 

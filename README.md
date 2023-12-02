@@ -37,25 +37,21 @@ Mirage`OpenCL`Translate[ir]
 the output will be
 
 ```c
-float kernel(x float, t float)
+float kernel(float x, float t)
 {
+    float sum2;
+    float w;
+    w = 0.;
+
+    while( w <= 10.)
     {
-        float sum2;
-        {
-            float w;
-            w = 0.;
-        }
-        while( w <= 10.)
-        {
-            sum2 = w * x + -1 * (w * t);
-            w = w + 0.01;
-        }
-        {
-            float sentimentalist1;
-            sentimentalist1 = sum2;
-        }
+        sum2 = w * x + ((float) -1) * (w * t);
+        w = w + 0.01;
     }
-    return sentimentalist1;
+    float paeony1;
+    paeony1 = sum2;
+
+    return paeony1;
 }
 ```
 

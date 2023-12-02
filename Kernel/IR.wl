@@ -104,7 +104,7 @@ Lexer[Set[a_, b_], env_] := Module[{},
       env[name] = Lexer`modifyVariable[name, result];
       IR`Entity[IR`Assign[env[name], result], result // Value, result // Type]
     ,
-      IR`Entity[IR`Block[{
+      IR`Entity[IR`List[{
         env[name] = Lexer`modifyVariable[name, result];
         IR`Define[env[name]],
         IR`Assign[env[name], result]
@@ -129,7 +129,7 @@ Lexer`modifyVariable[name_String, IR`Entity[data_, value_, type_]] := IR`Entity[
 Lexer[Set[a_, With[args_, body_]], env_] := Module[{},
   With[{scoped = MapHeld[Function[v, Lexer[v, env], HoldFirst], args]},
     With[{r = Lexer[Set[a, body], env]},
-      IR`Entity[IR`Block[{scoped, r} // Flatten], r // Value, r // Type]
+      IR`Entity[IR`List[{scoped, r} // Flatten], r // Value, r // Type]
     ]
   ]
 ]
@@ -137,7 +137,7 @@ Lexer[Set[a_, With[args_, body_]], env_] := Module[{},
 Lexer[Set[a_, Sum[expr_, {var_, from_, to_, st_}]], env_] := Module[{},
   With[{sum = Lexer`RandomName["sum"], init = Lexer[Set[var, from], env], till = Lexer[to, env]},
     With[{test = Lexer[Set[sum, expr], env]},
-      IR`Entity[IR`Block[{
+      IR`Entity[IR`List[{
         IR`Define[IR`Entity[sum, test // Value, test // Type]],
         init,
         IR`While[IR`Operator[LessEqual, Lexer[var, env], till],
