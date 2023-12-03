@@ -1,6 +1,6 @@
 ## Possibly a WL $\rightarrow$ C-like languages translator
 
-**In development.**
+**In development. just a prototype**
 
 ### Example
 Define an anonumous function
