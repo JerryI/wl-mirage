@@ -1,14 +1,10 @@
 SetDirectory[FileNameJoin[{If[StringQ[NotebookDirectory[]], NotebookDirectory[], DirectoryName[$InputFileName]]}]]
-Get[FileNameJoin[{"Kernel", "IR.wl"}]]
-Get[FileNameJoin[{"Kernel", "OpenCL.wl"}]]
 
-(* example function *)
-f = Function[{x,t}, Sum[Exp[I(w x - w t)], {w,0.0,10.0,0.01}] ];
+Get["IR.wl"];
+Get["CL.wl"];
 
-ir = Mirage`IR`Translate[f, {"x"->1.0, "t"->3.6}];
+Mirage`IR`Translate[
+    
+  Function[{x,t}, Sum[Exp[I w x - I w t], {w,0.1,10., 0.1} ]]
 
-Print["--- Intermediate Representation ---"];
-ir // Print;
-
-Print["--- C code ---"];
-Mirage`OpenCL`Translate[ir] // Print;
+, {"x"->0.1, "t"->2.}] // IR // MakeCL // ToCCodeString // Print
