@@ -130,7 +130,7 @@ cfloat kernel(float x, float t) {
   }
   cfloat latterly1;
   latterly1.re = reg6.re;
-  latterly1.im = reg6.im;
+  latterly1.im = reg6.im; 
 
   return latterly1;
 }
