@@ -14,9 +14,17 @@ __How it is implemented__
 ### Example
 Define a function and translate it to C-like language
 ```mathematica
+f =   Function[{x,t}, 
+  
+  With[{r = 0.8, d = 0.3}, Sum[
+
+  Exp[- I w t + I w x]
+  
+, {w, 5,10+5, 0.1}]]];
+
 Mirage`IR`Translate[
     
-  Function[{x,t}, Sum[Exp[I w x - I w t], {w,0.1,10., 0.1} ]]
+ f
 
 , {"x"->0.1, "t"->2.}] // IR // MakeCL // ToCCodeString // Print
 ```
@@ -25,58 +33,48 @@ The output firstly goes to sort of intermediate representation, and then, consid
 
 ```c
 cfloat kernel(float x, float t) {
-  float reg3;
-  reg3 = 0.1;
+  float r;
+  r = 0.8;
 
-  float reg4;
-  reg4 = 10.;
+  float d;
+  d = 0.3;
+
+  int reg3;
+  reg3 = 5;
+
+  int reg7;
+  reg7 = 10;
+
+  int reg8;
+  reg8 = 5;
+
+  int reg9;
+  reg9 = reg7 + reg8;
+
+  int reg4;
+  reg4 = reg9;
 
   float reg5;
   reg5 = 0.1;
 
-  float w;
+  int w;
   w = reg3;
 
   cfloat reg6;
   reg6.re = reg2.re;
   reg6.im = reg2.im;
 
-  while (w <= reg4) {
-    float reg27;
-    reg27 = w;
+  while (w <= (float) reg4) {
+    int reg30;
+    reg30 = w;
 
-    float reg28;
-    reg28 = 0.1;
+    float reg31;
+    reg31 = 0.1;
 
-    float reg29;
-    reg29 = reg27 + reg28;
+    float reg32;
+    reg32 = (float) reg30 + reg31;
 
-    w = reg29;
-    float reg15;
-    reg15 = 1;
-
-    float reg16;
-    reg16 = w;
-
-    cfloat reg17;
-    reg17.re = 0.;
-    reg17.im = reg15 * reg16;
-
-    cfloat reg12;
-    reg12.re = reg17.re;
-    reg12.im = reg17.im;
-
-    float reg13;
-    reg13 = x;
-
-    cfloat reg14;
-    reg14.re = reg12.re * reg13;
-    reg14.im = reg12.im * reg13;
-
-    cfloat reg9;
-    reg9.re = reg14.re;
-    reg9.im = reg14.im;
-
+    w = reg32;
     int reg21;
     reg21 = -1;
 
@@ -89,50 +87,73 @@ cfloat kernel(float x, float t) {
     float reg18;
     reg18 = reg23;
 
+    int reg19;
+    reg19 = w;
+
+    float reg20;
+    reg20 = reg18 * (float) reg19;
+
+    float reg15;
+    reg15 = reg20;
+
+    float reg16;
+    reg16 = t;
+
+    cfloat reg17;
+    reg17.re = reg15 * reg16;
+    reg17.im = 0.;
+
+    cfloat reg12;
+    reg12.re = reg17.re;
+    reg12.im = reg17.im;
+
+    float reg27;
+    reg27 = 1;
+
+    int reg28;
+    reg28 = w;
+
+    float reg29;
+    reg29 = 0.;
+
     float reg24;
-    reg24 = w;
+    reg24 = reg29;
 
     float reg25;
-    reg25 = t;
+    reg25 = x;
 
-    float reg26;
-    reg26 = reg24 * reg25;
+    cfloat reg26;
+    reg26.re = reg24 * reg25;
+    reg26.im = 0.;
 
-    float reg19;
-    reg19 = reg26;
+    cfloat reg13;
+    reg13.re = reg26.re;
+    reg13.im = reg26.im;
 
-    cfloat reg20;
-    reg20.re = reg18 * reg19;
-    reg20.im = 0.;
+    cfloat reg14;
+    reg14.re = reg12.re + reg13.re;
+    reg14.im = reg12.im + reg13.im;
 
     cfloat reg10;
-    reg10.re = reg20.re;
-    reg10.im = reg20.im;
+    reg10.re = reg14.re;
+    reg10.im = reg14.im;
 
     cfloat reg11;
-    reg11.re = reg9.re + reg10.re;
-    reg11.im = reg9.im + reg10.im;
-
-    cfloat reg7;
-    reg7.re = reg11.re;
-    reg7.im = reg11.im;
-
-    cfloat reg8;
-    reg8.re = cos(reg7.im) * exp(reg7.re);
-    reg8.im = sin(reg7.im) * exp(reg7.re);
+    reg11.re = cos(reg10.im) * exp(reg10.re);
+    reg11.im = sin(reg10.im) * exp(reg10.re);
 
     cfloat reg2;
-    reg2.re = reg8.re;
-    reg2.im = reg8.im;
+    reg2.re = reg11.re;
+    reg2.im = reg11.im;
 
     reg6.re = reg6.re + reg2.re;
     reg6.im = reg6.im + reg2.im;
   }
-  cfloat latterly1;
-  latterly1.re = reg6.re;
-  latterly1.im = reg6.im; 
+  cfloat opaquely1;
+  opaquely1.re = reg6.re;
+  opaquely1.im = reg6.im;
 
-  return latterly1;
+  return opaquely1;
 }
 ```
 

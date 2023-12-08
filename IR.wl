@@ -1,3 +1,4 @@
+
 BeginPackage["JerryI`Mirage`IR`"]
 
 (* utils *)
@@ -25,15 +26,18 @@ IR`Entity /: Type[IR`Entity[data_, value_, type_]] := type
 
 (* type detection *)
 Lexer`Type[_Real] := IR`Type`Real 
+Lexer`Type[_Rational] := IR`Type`Real 
 Lexer`Type[i_Complex] := If[Re[i] === 0, IR`Type`Complex`Re, If[Im[i] === 0, IR`Type`Complex`Im, IR`Type`Complex] ] 
 Lexer`Type[I] := IR`Type`Complex`Im 
 Lexer`Type[_Integer] := IR`Type`Integer
 
 
 (* constants *)
+Lexer[a_Rational, env_] := IR`Entity[IR`Constant, a // N, Lexer`Type[a]]
 Lexer[a_Real, env_] := IR`Entity[IR`Constant, a, Lexer`Type[a]]
 Lexer[a_Integer, env_] := IR`Entity[IR`Constant, a, Lexer`Type[a]]
 Lexer[a_Complex, env_] := IR`Entity[IR`Constant, a, Lexer`Type[a]]
+Lexer[(*SpB[*)Power[E(*|*),(*|*)x_](*]SpB*), env_] := IR`Entity[IR`Constant, x // N, Lexer`Type[Exp[x] // N]]
 
 (* anything which is unknown to the system *)
 Lexer[any_, env_] := IR`Entity[IR`Unknown[any], Undefined, Undefined] 
@@ -41,6 +45,8 @@ SetAttributes[IR`Unknown, HoldFirst]
 
 (* take a symbol from the stack *)
 Lexer[a_Symbol, env_] := env[Lexer`Name[a]]
+
+Lexer[Pi, env_]:=IR`Entity[IR`Constant, 3.141592653589793, IR`Type`Real] 
 
 Lexer[I, env_] := IR`Entity[IR`Constant, I, IR`Type`Complex`Im] 
 
